@@ -38,43 +38,7 @@ class GameCommands(commands.Cog):
                 ephemeral=True
             )
 
-        # data = ImageDataLoader(caminho_local).analyse_scoreboard()
-        data = {
-        "score":"13-9",
-        "status":"VITÓRIA",
-        "players":[
-            {
-                "nick":"Lucas Foguetes ツ",
-                "kda":"16/7/7",
-                "tag":"Amaciador",
-                "hs":"40%"
-            },
-            {
-                "nick":"Mr.Azeitona",
-                "kda":"27/12/1",
-                "tag":"Matador quádruplo",
-                "hs":"55%"
-            },
-            {
-                "nick":"raynier",
-                "kda":"22/15/2",
-                "tag":"Senhor das armas",
-                "hs":"50%"
-            },
-            {
-                "nick":"Латинский алфави",
-                "kda":"13/16/5",
-                "tag":"Incendiário",
-                "hs":"15%"
-            },
-            {
-                "nick":"Tu-π",
-                "kda":"8/12/5",
-                "tag":"Ofuscante",
-                "hs":"12%"
-            }
-        ]
-        }
+        data = ImageDataLoader(caminho_local).analyse_scoreboard()
 
         if not data:
             await interaction.followup.send(
@@ -114,7 +78,16 @@ class GameCommands(commands.Cog):
                 StatService().save_stat(stat)
 
         await interaction.followup.send(
-            'Jogo e estatísticas salvos com sucesso!',
+            f'Jogo e estatísticas salvos com sucesso! Com o ID: {game_id}',
+            ephemeral=True
+        )
+
+    @app_commands.command(name='delete-game', description='Deletar um jogo')
+    @app_commands.describe(id='Id do Jogo')
+    async def save_game(self, interaction: discord.Interaction, imagem: discord.Attachment, id: int):
+        # TODO - implementar funcionalidade 
+        await interaction.followup.send(
+            f'Funcionalidade ainda não implementada, fale com o @Ranier`).', 
             ephemeral=True
         )
 
