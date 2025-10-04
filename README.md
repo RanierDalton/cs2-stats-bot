@@ -22,7 +22,6 @@ Recomendamos **Docker e Docker Compose** para gerenciar o ambiente de desenvolvi
 1.  Clone o repositório:
     ```bash
     git clone https://github.com/RanierDalton/cs2-stats-bot.git
-    mkdir cs-stats-bot
     cd cs-stats-bot
     ```
 2.  Crie e preencha o arquivo **`.env`** na raiz do projeto:
@@ -37,21 +36,6 @@ Recomendamos **Docker e Docker Compose** para gerenciar o ambiente de desenvolvi
     DB_USER=cs_user
     DB_PASSWORD=senha_secreta
     DB_NAME=cs_stats
-    ```
-3.  Crie o arquivo **`docker-compose.yml`** para orquestrar os serviços `db` (MySQL) e `bot`:
-
-    ```yaml
-    version: '3.8'
-
-    services:
-      bot:
-        build: .
-        container_name: cs_stats_bot
-        restart: always
-        env_file:
-          - .env 
-        depends_on:
-          - db
     ```
 
 ### 2. Execução
