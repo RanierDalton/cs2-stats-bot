@@ -79,17 +79,15 @@ class GameCommands(commands.Cog):
 
         await interaction.followup.send(
             f'Jogo e estatísticas salvos com sucesso! Com o ID: {game_id}',
-            ephemeral=True
+            ephemeral=False
         )
 
     @app_commands.command(name='delete-game', description='Deletar um jogo')
     @app_commands.describe(id='Id do Jogo')
-    async def save_game(self, interaction: discord.Interaction, imagem: discord.Attachment, id: int):
+    async def delete_game(self, interaction: discord.Interaction, id: int):
+        await interaction.response.defer(thinking=True, ephemeral=False)
         # TODO - implementar funcionalidade 
         await interaction.followup.send(
-            f'Funcionalidade ainda não implementada, fale com o @Ranier`).', 
-            ephemeral=True
+            f'Funcionalidade ainda não implementada, fale com o @Ranier.', 
+            ephemeral=False
         )
-
-async def setup(bot):
-    await bot.add_cog(GameCommands(bot))

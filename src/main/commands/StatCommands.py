@@ -12,15 +12,16 @@ class StatCommands(commands.Cog):
 
     @app_commands.command(name='get-player-stat', description='Pegar stats de um jogador pelo Nick dele')
     @app_commands.describe(nick='Nick do Jogador')
-    async def get_stat(self, interaction: discord.Interaction, nick: str): 
+    async def get_player_stat(self, interaction: discord.Interaction, nick: str): 
+        await interaction.response.defer(thinking=True, ephemeral=False)
         # TODO - Implementar funcionalidade
         await interaction.followup.send(
-            f'Funcionalidade ainda não implementada, fale com o @Ranier`).', 
-            ephemeral=True
+            f'Funcionalidade ainda não implementada, fale com o @Ranier', 
+            ephemeral=False
         )
 
     @app_commands.command(name='get-all-player-stats', description='Mostra as estatísticas agregadas de TODOS os jogadores.')
-    async def get_all_stats(self, interaction: discord.Interaction):
+    async def get_all_player_stats(self, interaction: discord.Interaction):
         
         await interaction.response.defer(thinking=True, ephemeral=False)
         
@@ -57,19 +58,21 @@ class StatCommands(commands.Cog):
 
     @app_commands.command(name='get-map-stats', description='Pegar stats de um mapa')
     @app_commands.describe(mapa='Nome do Mapa')
-    async def get_stat(self, interaction: discord.Interaction, nick: str): 
+    async def get_map_stats(self, interaction: discord.Interaction, mapa: str): 
+        await interaction.response.defer(thinking=True, ephemeral=False)
         # TODO - Implementar funcionalidade 
         # TODO - Ver algo sobre listagem de mapas por ui.Select do proprio discord
         await interaction.followup.send(
-            f'Funcionalidade ainda não implementada, fale com o @Ranier`).', 
-            ephemeral=True
+            f'Funcionalidade ainda não implementada, fale com o @Ranier', 
+            ephemeral=False
         )
 
     @app_commands.command(name='get-maps-stats', description='Pegar stats de TODOS os mapas')
     @app_commands.describe()
-    async def get_stat(self, interaction: discord.Interaction): 
+    async def get_all_maps_stats(self, interaction: discord.Interaction): 
+        await interaction.response.defer(thinking=True, ephemeral=False)
         # TODO - Implementar funcionalidade 
         await interaction.followup.send(
-            f'Funcionalidade ainda não implementada, fale com o @Ranier`).', 
-            ephemeral=True
+            f'Funcionalidade ainda não implementada, fale com o @Ranier', 
+            ephemeral=False
         )

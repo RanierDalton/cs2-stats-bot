@@ -10,7 +10,9 @@ class PlayerService:
 
     def get_player_by_nick(self, nick: str):
         result = self.model.get_player_by_nick(nick)
-        return PlayerMapper.from_touple(result)
+        if result:
+            return PlayerMapper.from_touple(result)
+        return None
 
     def save(self, player):
         return self.model.save(player)
