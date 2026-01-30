@@ -15,7 +15,7 @@ class GameMapper:
         allies_rounds = data.get('score').split('-')[0]
         adversary_rounds = data.get('score').split('-')[1]
 
-        status = 'win' if allies_rounds > adversary_rounds else 'draw' if allies_rounds == adversary_rounds else 'lose'
+        status = 'win' if int(allies_rounds) > int(adversary_rounds) else 'draw' if int(allies_rounds) == int(adversary_rounds) else 'lose'
 
         game = Game(
             allies_rounds=allies_rounds,

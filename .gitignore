@@ -1,5 +1,16 @@
+# General
 .env
 env/
-
 __pycache__/
+
+# Version Control
 .git
+
+# Cache (generic)
+*cache*.*
+*cache*
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db

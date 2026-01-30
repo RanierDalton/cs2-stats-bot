@@ -57,7 +57,7 @@ No terminal (dentro da pasta `cs2-stats-bot`):
 
 ```bash
 # Se estiver no Linux/macOS ou PowerShell (Windows)
-docker run --name mysql-db -v "${PWD}/db.sql:/docker-entrypoint-initdb.d/init.sql" -e MYSQL_ROOT_PASSWORD=senha_secreta -e MYSQL_DATABASE=cs_stats -p 3306:3306 -d mysql:8.0
+docker run --name mysql-db -e MYSQL_ROOT_PASSWORD=senha_secreta -e MYSQL_DATABASE=cs_stats -p 3306:3306 -d mysql:8.0
 ```
 
 > [!NOTE]
