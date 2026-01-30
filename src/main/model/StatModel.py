@@ -54,21 +54,29 @@ class StatModel:
         SELECT
             M.name,
             COUNT(DISTINCT G.id) as games_played,
-            SUM(CASE WHEN G.status = 'win' THEN 1 ELSE 0 END) as wins,
-            SUM(CASE WHEN G.status = 'lose' THEN 1 ELSE 0 END) as losses,
-            SUM(CASE WHEN G.status = 'draw' THEN 1 ELSE 0 END) as draws,
+            COUNT(DISTINCT CASE WHEN G.status = 'win' THEN G.id END) as wins,
+            COUNT(DISTINCT CASE WHEN G.status = 'lose' THEN G.id END) as losses,
+            COUNT(DISTINCT CASE WHEN G.status = 'draw' THEN G.id END) as draws,
             AVG(G.allies_rounds) as avg_rounds_won,
-            AVG(G.adversary_rounds) as avg_rounds_lost
+            AVG(G.adversary_rounds) as avg_rounds_lost,
+            (COUNT(DISTINCT CASE WHEN G.status = 'win' THEN G.id END) / NULLIF(COUNT(DISTINCT G.id), 0)) * 100 as win_rate,
+            AVG(GD.damage) as avg_damage,
+            AVG(GD.headshot) as avg_headshot
         FROM map M
         JOIN game G ON M.id = G.fk_map
+        LEFT JOIN game_data GD ON G.id = GD.fk_game
         WHERE M.name = %s
         GROUP BY M.id, M.name
         """
         params = (map_name,)
         return self.driver.select(query, params)
 
-    def get_all_maps_stats(self):
-        query = """
+    def get_all_maps_stats(self, sort_by: str = 'games'):
+        order_clause = "games_played DESC"
+        if sort_by == 'win_rate':
+            order_clause = "win_rate DESC"
+
+        query = f"""
         SELECT
             M.name,
             COUNT(DISTINCT G.id) as games_played,
@@ -76,11 +84,12 @@ class StatModel:
             SUM(CASE WHEN G.status = 'lose' THEN 1 ELSE 0 END) as losses,
             SUM(CASE WHEN G.status = 'draw' THEN 1 ELSE 0 END) as draws,
             AVG(G.allies_rounds) as avg_rounds_won,
-            AVG(G.adversary_rounds) as avg_rounds_lost
+            AVG(G.adversary_rounds) as avg_rounds_lost,
+            (SUM(CASE WHEN G.status = 'win' THEN 100.0 ELSE 0.0 END) / NULLIF(COUNT(G.id), 0)) as win_rate
         FROM map M
         LEFT JOIN game G ON M.id = G.fk_map
         GROUP BY M.id, M.name
-        ORDER BY games_played DESC
+        ORDER BY {order_clause}
         """
         return self.driver.select_all(query)
 

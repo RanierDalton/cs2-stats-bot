@@ -1,6 +1,7 @@
 from src.shared.database.interfaces.DBDriver import DBDriver
 from src.main.base.Player import Player
 
+
 class PlayerModel:
     def __init__(self, driver: DBDriver):
         self.driver = driver

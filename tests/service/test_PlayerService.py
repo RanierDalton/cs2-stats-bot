@@ -1,5 +1,5 @@
-from src.main.base.Player import Player
 from src.main.service.PlayerService import PlayerService
+from src.main.base.Player import Player
 import unittest
 from unittest.mock import MagicMock, patch
 import sys

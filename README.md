@@ -93,6 +93,38 @@ O projeto possui a seguinte arquitetura:
 
 -----
 
+## 🧪 Testes e Qualidade de Código
+
+Para garantir a estabilidade e o padrão do código, utilizamos `unittest`, `flake8` e `autopep8`.
+
+### 1. Executando Testes Unitários
+Para rodar a suíte de testes (atualmente 27 testes):
+
+```powershell
+# Windows
+$env:PYTHONPATH='.'; python -m unittest discover -s tests
+
+# Linux/Mac
+export PYTHONPATH=$PYTHONPATH:.
+python -m unittest discover -s tests
+```
+
+### 2. Verificando Lint (Flake8)
+Para verificar se o código segue o padrão (PEP 8 com ajustes):
+
+```bash
+flake8 .
+```
+
+### 3. Corrigindo Formatação Automaticamente (Autopep8)
+Para corrigir automaticamente espaços, indentação e outros erros de estilo:
+
+```bash
+autopep8 --in-place --recursive --aggressive .
+```
+
+-----
+
 ## 🚀 Build e Deploy em Produção
 
 Os scripts a seguir automatizam a preparação de um ambiente Linux (Ubuntu) para o deploy.
@@ -113,10 +145,10 @@ sudo apt-get install ca-certificates curl git -y
 
 # Instala o Docker
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL [https://download.docker.com/linux/ubuntu/gpg](https://download.docker.com/linux/ubuntu/gpg) -o /etc/apt/keyrings/docker.asc
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] [https://download.docker.com/linux/ubuntu](https://download.docker.com/linux/ubuntu) \
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
@@ -148,7 +180,7 @@ sudo systemctl start mysql
 sudo systemctl enable mysql
 
 # Clonagem do repositório contendo o script SQL
-git clone [https://github.com/InfraWatch-inc/database.git](https://github.com/InfraWatch-inc/database.git)
+git clone https://github.com/InfraWatch-inc/database.git
 
 # Aplica o script SQL para criar o DB e as tabelas
 sudo mysql < database/script.sql

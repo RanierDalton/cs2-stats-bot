@@ -52,18 +52,21 @@ class StatService:
                 "losses": row[3],
                 "draws": row[4],
                 "avg_rounds_won": float(row[5]) if row[5] else 0.0,
-                "avg_rounds_lost": float(row[6]) if row[6] else 0.0
+                "avg_rounds_lost": float(row[6]) if row[6] else 0.0,
+                "win_rate": float(row[7]) if row[7] else 0.0,
+                "avg_damage": float(row[8]) if row[8] else 0.0,
+                "avg_headshot": float(row[9]) if row[9] else 0.0
             }
         return None
 
-    def get_all_maps_stats(self):
-        results = self.model.get_all_maps_stats()
+    def get_all_maps_stats(self, sort_by: str = 'games'):
+        results = self.model.get_all_maps_stats(sort_by)
         if not results:
             return []
 
         maps_stats = []
         for row in results:
-            if row[0]:  # Ensure map name exists
+            if row[0]:
                 maps_stats.append({
                     "name": row[0],
                     "games": row[1],
@@ -71,6 +74,7 @@ class StatService:
                     "losses": row[3],
                     "draws": row[4],
                     "avg_rounds_won": float(row[5]) if row[5] else 0.0,
-                    "avg_rounds_lost": float(row[6]) if row[6] else 0.0
+                    "avg_rounds_lost": float(row[6]) if row[6] else 0.0,
+                    "win_rate": float(row[7]) if row[7] else 0.0
                 })
         return maps_stats

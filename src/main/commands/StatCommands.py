@@ -102,6 +102,10 @@ class StatCommands(commands.Cog):
 
             embed.add_field(name="Média Rounds (Allies)", value=f"{stats['avg_rounds_won']:.1f}", inline=True)
             embed.add_field(name="Média Rounds (Adversary)", value=f"{stats['avg_rounds_lost']:.1f}", inline=True)
+            embed.add_field(name="Win Rate do Mapa", value=f"{stats['win_rate']:.1f}%", inline=True)
+
+            embed.add_field(name="Dano Médio", value=f"{stats['avg_damage']:.1f}", inline=True)
+            embed.add_field(name="Headshot Médio", value=f"{stats['avg_headshot']:.1f}%", inline=True)
 
             await interaction.followup.send(embed=embed)
 
@@ -109,17 +113,25 @@ class StatCommands(commands.Cog):
             await interaction.followup.send(f'Erro ao buscar stats do mapa: {e}', ephemeral=True)
 
     @app_commands.command(name='get-all-maps-stats', description='Mostra ranking de mapas mais jogados.')
-    async def get_all_maps_stats(self, interaction: discord.Interaction):
+    @app_commands.describe(ordenar_por='Critério de ordenação')
+    @app_commands.choices(ordenar_por=[
+        app_commands.Choice(name="Jogos", value="games"),
+        app_commands.Choice(name="Win Rate", value="win_rate")
+    ])
+    async def get_all_maps_stats(self, interaction: discord.Interaction, ordenar_por: str = 'games'):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:
-            maps_stats = self.stat_service.get_all_maps_stats()
+            maps_stats = self.stat_service.get_all_maps_stats(ordenar_por)
             if not maps_stats:
                 await interaction.followup.send("Nenhum dado encontrado.", ephemeral=True)
                 return
 
+            term_map = {'games': 'Jogos', 'win_rate': 'Win Rate'}
+            desc = f"Mapas ordenados por {term_map.get(ordenar_por, 'Jogos')}."
+
             embed = discord.Embed(
                 title="🗺️ Ranking de Mapas",
-                description="Mapas ordenados por quantidade de partidas jogadas.",
+                description=desc,
                 color=discord.Color.purple()
             )
 
@@ -130,10 +142,7 @@ class StatCommands(commands.Cog):
             for m in maps_stats:
                 name_col.append(m['name'])
                 games_col.append(str(m['games']))
-
-                total_decisive_games = m['wins'] + m['losses']
-                winrate = (m['wins'] / total_decisive_games * 100) if total_decisive_games > 0 else 0.0
-                winrate_col.append(f"{winrate:.1f}%")
+                winrate_col.append(f"{m['win_rate']:.1f}%")
 
             if name_col:
                 embed.add_field(name="Mapa", value='\n'.join(name_col), inline=True)
