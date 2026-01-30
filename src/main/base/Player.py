@@ -16,11 +16,11 @@ class Player:
     @property
     def id(self):
         return self._id
-    
+
     @property
     def name(self):
         return self._name
-    
+
     @property
     def nick(self):
         return self._nick

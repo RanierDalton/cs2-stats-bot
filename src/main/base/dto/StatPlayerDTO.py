@@ -5,4 +5,3 @@ class StatPlayerDTO:
         self.winrate = winrate
         self.best_map = best_map
         self.worse_map = worse_map
-

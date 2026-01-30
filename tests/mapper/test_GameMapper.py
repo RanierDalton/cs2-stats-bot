@@ -1,6 +1,7 @@
 import unittest
 from src.main.mapper.GameMapper import GameMapper
 
+
 class TestGameMapper(unittest.TestCase):
 
     def test_from_dict_win(self):
@@ -23,6 +24,7 @@ class TestGameMapper(unittest.TestCase):
         self.assertEqual(game.allies_rounds, '15')
         self.assertEqual(game.adversary_rounds, '15')
         self.assertEqual(game.status, 'draw')
+
 
 if __name__ == '__main__':
     unittest.main()

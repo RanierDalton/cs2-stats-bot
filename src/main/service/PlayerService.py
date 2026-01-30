@@ -3,6 +3,7 @@ from src.shared.database.MySqlConnection import MySqlConnection
 from src.main.model.PlayerModel import PlayerModel
 from src.main.mapper.PlayerMapper import PlayerMapper
 
+
 class PlayerService:
     def __init__(self):
         self.driver = MySqlDriver(MySqlConnection())

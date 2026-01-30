@@ -7,15 +7,15 @@ class Map:
     @property
     def id(self):
         return self._id
-    
+
     @property
     def name(self):
         return self._name
-    
+
     @property
     def is_active(self):
         return self._is_active
-    
+
     def set_name(self, name):
         self._name = name
 

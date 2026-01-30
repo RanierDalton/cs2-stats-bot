@@ -4,6 +4,7 @@ from src.shared.database.MySqlDriver import MySqlDriver
 from src.shared.database.MySqlConnection import MySqlConnection
 from src.main.mapper.StatPlayerMapper import StatPlayerMapper
 
+
 class StatService:
     def __init__(self):
         self.driver = MySqlDriver(MySqlConnection())
@@ -11,10 +12,10 @@ class StatService:
 
     def save_stat(self, stat: Stat) -> int:
         return self.model.save_stat(stat)
-    
+
     def delete_stats_by_game_id(self, game_id: int):
         return self.model.delete_stats_by_game_id(game_id)
-    
+
     def get_all_players_stats(self) -> list:
         players_stats = self.model.get_all_players_stats()
         return StatPlayerMapper.from_touple_list(players_stats)
@@ -22,8 +23,8 @@ class StatService:
     def get_player_stats(self, nick: str):
         result = self.model.get_player_stats(nick)
         if result:
-            row = result 
-            if not row[0]: 
+            row = result
+            if not row[0]:
                 return None
             return {
                 "nick": row[0],
@@ -41,8 +42,9 @@ class StatService:
     def get_map_stats(self, map_name: str):
         result = self.model.get_map_stats(map_name)
         if result:
-            row = result # Result IS the row
-            if not row[0]: return None
+            row = result  # Result IS the row
+            if not row[0]:
+                return None
             return {
                 "name": row[0],
                 "games": row[1],
@@ -58,10 +60,10 @@ class StatService:
         results = self.model.get_all_maps_stats()
         if not results:
             return []
-        
+
         maps_stats = []
         for row in results:
-            if row[0]: # Ensure map name exists
+            if row[0]:  # Ensure map name exists
                 maps_stats.append({
                     "name": row[0],
                     "games": row[1],

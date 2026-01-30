@@ -1,6 +1,7 @@
 from ...shared.database.interfaces.DBDriver import DBDriver
 from ..base.Stat import Stat
 
+
 class StatModel:
     def __init__(self, driver: DBDriver):
         self.driver = driver
@@ -26,10 +27,10 @@ class StatModel:
         query = "DELETE FROM game_data WHERE fk_game = %s"
         params = (game_id,)
         return self.driver.delete(query, params)
-    
+
     def get_player_stats(self, nick: str):
         query = """
-        SELECT 
+        SELECT
             P.nick,
             SUM(GD.kills) AS total_kills,
             SUM(GD.deaths) AS total_deaths,
@@ -50,7 +51,7 @@ class StatModel:
 
     def get_map_stats(self, map_name: str):
         query = """
-        SELECT 
+        SELECT
             M.name,
             COUNT(DISTINCT G.id) as games_played,
             SUM(CASE WHEN G.status = 'win' THEN 1 ELSE 0 END) as wins,
@@ -68,7 +69,7 @@ class StatModel:
 
     def get_all_maps_stats(self):
         query = """
-        SELECT 
+        SELECT
             M.name,
             COUNT(DISTINCT G.id) as games_played,
             SUM(CASE WHEN G.status = 'win' THEN 1 ELSE 0 END) as wins,

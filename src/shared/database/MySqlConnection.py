@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+
 class MySqlConnection(DBConnection):
     def __init__(self):
         self._host = os.getenv("DB_HOST")
@@ -14,7 +15,7 @@ class MySqlConnection(DBConnection):
         self._connection = None
         self._cursor = None
         self.connect()
-    
+
     def connect(self):
         if self._connection is None or not self._connection.is_connected():
             self._connection = mysql.connect(
@@ -30,7 +31,7 @@ class MySqlConnection(DBConnection):
         if self.connection.is_connected():
             self.cursor.close()
             self.connection.close()
-    
+
     def execute_query(self, query):
         self.cursor.execute(query)
         return self.cursor.fetchall()

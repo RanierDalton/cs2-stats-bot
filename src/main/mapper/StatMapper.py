@@ -1,5 +1,6 @@
 from ..base.Stat import Stat
 
+
 class StatMapper:
     @staticmethod
     def from_dict(data, game_id: int):
@@ -10,14 +11,14 @@ class StatMapper:
         try:
             kda_str = data.get('kda', '0/0/0')
             parts = kda_str.replace('-', '/').split('/')
-            
+
             if len(parts) > 0:
                 kills = int(parts[0]) if parts[0].strip().isdigit() else 0
             if len(parts) > 1:
                 deaths = int(parts[1]) if parts[1].strip().isdigit() else 0
             if len(parts) > 2:
                 assists = int(parts[2]) if parts[2].strip().isdigit() else 0
-                
+
         except ValueError:
             print(f"Erro ao fazer parse do KDA: {data.get('kda')}")
             pass
@@ -27,7 +28,7 @@ class StatMapper:
             kills=kills,
             deaths=deaths,
             assists=assists,
-            headshot=int(str(data.get('hs', '0')).replace('%', '')), # Ensure string for replace
+            headshot=int(str(data.get('hs', '0')).replace('%', '')),  # Ensure string for replace
             damage=int(data.get('damage', '0')),
             tag=data.get('tag', ''),
             player_nick=data.get('nick', ''),

@@ -1,6 +1,7 @@
 from src.shared.database.interfaces.DBDriver import DBDriver
 from src.main.base.Game import Game
 
+
 class GameModel:
     def __init__(self, driver: DBDriver):
         self.driver = driver
@@ -17,7 +18,7 @@ class GameModel:
         query = "DELETE FROM game WHERE id = %s"
         params = (id,)
         return self.driver.delete(query, params)
-    
+
     def get_by_id(self, id: int):
         query = "SELECT * FROM game WHERE id = %s"
         params = (id,)

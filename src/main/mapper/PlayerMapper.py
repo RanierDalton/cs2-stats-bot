@@ -1,5 +1,6 @@
 from ..base.Player import Player
 
+
 class PlayerMapper:
     @staticmethod
     def from_dict(data, game_id: int):
@@ -18,7 +19,7 @@ class PlayerMapper:
             player = PlayerMapper.from_dict(data, game_id)
             players.append(player)
         return players
-    
+
     @staticmethod
     def from_touple(data):
         player = Player(

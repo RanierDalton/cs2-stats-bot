@@ -1,5 +1,6 @@
 from src.main.base.dto.StatPlayerDTO import StatPlayerDTO
 
+
 class StatPlayerMapper:
     @staticmethod
     def from_touple_list(data):
@@ -7,7 +8,7 @@ class StatPlayerMapper:
         for stat in data:
             list.append(StatPlayerMapper.from_touple(stat))
         return list
-            
+
     @staticmethod
     def from_touple(data):
         player = StatPlayerDTO(

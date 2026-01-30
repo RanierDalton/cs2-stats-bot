@@ -1,6 +1,7 @@
 import unittest
 from src.main.mapper.PlayerMapper import PlayerMapper
 
+
 class TestPlayerMapper(unittest.TestCase):
 
     def test_from_dict(self):
@@ -16,6 +17,7 @@ class TestPlayerMapper(unittest.TestCase):
         self.assertEqual(player.id, 10)
         self.assertEqual(player.name, 'Lucas')
         self.assertEqual(player.nick, 'lucas_nick')
+
 
 if __name__ == '__main__':
     unittest.main()

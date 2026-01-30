@@ -3,14 +3,15 @@ import json
 from google import genai
 from google.genai import types
 from PIL import Image
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 IMAGE_PATH = "image.png"
+
 
 class ImageDataLoader:
     def __init__(self, image_path: str):
-        self.prompt =  """
+        self.prompt = """
             Analise esta imagem que é um placar de final de jogo de Counter-Strike 2.
             Extraia o placar geral, o status da partida, e as estatísticas detalhadas de CADA UM dos cinco jogadores exibidos na parte inferior.
             Seja preciso com a transcrição dos nomes e dos números.
@@ -52,7 +53,7 @@ class ImageDataLoader:
             return img
         except FileNotFoundError:
             return None
-    
+
     def analyse_scoreboard(self):
         try:
             response = self.client.models.generate_content(
@@ -64,5 +65,5 @@ class ImageDataLoader:
                 ),
             )
             return json.loads(response.text)
-        except Exception as e:
+        except Exception:
             return None

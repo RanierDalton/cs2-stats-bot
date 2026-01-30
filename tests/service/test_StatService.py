@@ -1,3 +1,4 @@
+from src.main.service.StatService import StatService
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -7,7 +8,6 @@ sys.modules['mysql'] = mock_mysql
 sys.modules['mysql.connector'] = mock_mysql
 sys.modules['dotenv'] = MagicMock()
 
-from src.main.service.StatService import StatService
 
 class TestStatService(unittest.TestCase):
 
@@ -26,9 +26,9 @@ class TestStatService(unittest.TestCase):
         self.mock_model.get_player_stats.return_value = (
             "Ranie", 100, 50, 25, 2.5, 60.0, 40, 5000, 10
         )
-        
+
         result = self.service.get_player_stats("ranie")
-        
+
         self.assertIsNotNone(result)
         self.assertEqual(result['nick'], "Ranie")
         self.assertEqual(result['kills'], 100)
@@ -44,13 +44,14 @@ class TestStatService(unittest.TestCase):
             ("Mirage", 10, 5, 5, 0, 13.0, 11.0),
             ("Nuke", 5, 2, 3, 0, 10.0, 13.0)
         ]
-        
+
         stats = self.service.get_all_maps_stats()
-        
+
         self.assertEqual(len(stats), 2)
         self.assertEqual(stats[0]['name'], "Mirage")
         self.assertEqual(stats[0]['games'], 10)
         self.assertEqual(stats[1]['name'], "Nuke")
+
 
 if __name__ == '__main__':
     unittest.main()

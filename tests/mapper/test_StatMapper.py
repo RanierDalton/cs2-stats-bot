@@ -1,6 +1,7 @@
 import unittest
 from src.main.mapper.StatMapper import StatMapper
 
+
 class TestStatMapper(unittest.TestCase):
 
     def test_kda_parsing_valid(self):
@@ -40,7 +41,7 @@ class TestStatMapper(unittest.TestCase):
         stat = StatMapper.from_dict(data, game_id=1)
         self.assertEqual(stat.kills, 20)
         self.assertEqual(stat.deaths, 10)
-        self.assertEqual(stat.assists, 0) # Assumed 0
+        self.assertEqual(stat.assists, 0)  # Assumed 0
 
     def test_kda_parsing_single(self):
         data = {
@@ -68,6 +69,7 @@ class TestStatMapper(unittest.TestCase):
         self.assertEqual(stat.kills, 0)
         self.assertEqual(stat.deaths, 0)
         self.assertEqual(stat.assists, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

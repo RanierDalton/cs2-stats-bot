@@ -1,4 +1,3 @@
-from discord import app_commands
 import os
 from dotenv import load_dotenv
 from src.main.Bot import Bot

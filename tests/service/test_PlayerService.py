@@ -1,3 +1,5 @@
+from src.main.base.Player import Player
+from src.main.service.PlayerService import PlayerService
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -7,8 +9,6 @@ sys.modules['mysql'] = mock_mysql
 sys.modules['mysql.connector'] = mock_mysql
 sys.modules['dotenv'] = MagicMock()
 
-from src.main.service.PlayerService import PlayerService
-from src.main.base.Player import Player
 
 class TestPlayerService(unittest.TestCase):
 
@@ -27,9 +27,9 @@ class TestPlayerService(unittest.TestCase):
     def test_get_player_by_nick_found(self):
         # Model returns tuple
         self.mock_model.get_player_by_nick.return_value = (1, "Ranie", "ranie")
-        
+
         result = self.service.get_player_by_nick("ranie")
-        
+
         self.assertIsNotNone(result)
         self.assertEqual(result.id, 1)
         self.assertEqual(result.name, "Ranie")
@@ -37,9 +37,9 @@ class TestPlayerService(unittest.TestCase):
 
     def test_get_player_by_nick_not_found(self):
         self.mock_model.get_player_by_nick.return_value = None
-        
+
         result = self.service.get_player_by_nick("unknown")
-        
+
         self.assertIsNone(result)
 
     def test_get_all_players(self):
@@ -47,12 +47,13 @@ class TestPlayerService(unittest.TestCase):
             (1, "Ranie", "ranie"),
             (2, "Lucas", "lucas")
         ]
-        
+
         players = self.service.get_all()
-        
+
         self.assertEqual(len(players), 2)
         self.assertEqual(players[0].name, "Ranie")
         self.assertEqual(players[1].name, "Lucas")
+
 
 if __name__ == '__main__':
     unittest.main()

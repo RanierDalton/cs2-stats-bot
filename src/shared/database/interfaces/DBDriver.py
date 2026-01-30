@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from .DBConnection import DBConnection
 
+
 class DBDriver(ABC):
     def __init__(self, connection: DBConnection):
         self._connection = connection
