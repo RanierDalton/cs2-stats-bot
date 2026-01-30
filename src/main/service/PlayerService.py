@@ -41,3 +41,9 @@ class PlayerService:
 
     def delete(self, id: int):
         return self.model.delete(id)
+
+    def search_players(self, term: str):
+        results = self.model.search_by_nick(term)
+        if not results:
+            return []
+        return [row[0] for row in results]

@@ -17,9 +17,18 @@ from ..base.Player import Player
 class GameCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.map_service = MapService()
+
+    async def map_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            maps = self.map_service.search_maps(current if current else "")
+            return [app_commands.Choice(name=map_name, value=map_name) for map_name in maps[:25]]
+        except Exception:
+            return []
 
     @app_commands.command(name='save-game', description='Cadastrar um jogo')
     @app_commands.describe(imagem='Imagem do Final da Partida', mapa='Nome do Mapa')
+    @app_commands.autocomplete(mapa=map_autocomplete)
     async def save_game(self, interaction: discord.Interaction, imagem: discord.Attachment, mapa: str):
         if not imagem.content_type.startswith('image/'):
             await interaction.followup.send(

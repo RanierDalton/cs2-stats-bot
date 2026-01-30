@@ -1,5 +1,3 @@
-from src.main.base.Map import Map
-from src.main.service.MapService import MapService
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -8,6 +6,9 @@ mock_mysql = MagicMock()
 sys.modules['mysql'] = mock_mysql
 sys.modules['mysql.connector'] = mock_mysql
 sys.modules['dotenv'] = MagicMock()
+
+from src.main.base.Map import Map  # noqa: E402
+from src.main.service.MapService import MapService  # noqa: E402
 
 
 class TestMapService(unittest.TestCase):
@@ -64,6 +65,18 @@ class TestMapService(unittest.TestCase):
         self.assertTrue(maps[0].is_active)
         self.assertEqual(maps[1].name, "Nuke")
         self.assertFalse(maps[1].is_active)
+
+    def test_search_maps(self):
+        self.mock_model.search_by_name.return_value = [
+            ("Dust2",),
+            ("Mirage",)
+        ]
+
+        result = self.service.search_maps("")
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], "Dust2")
+        self.assertEqual(result[1], "Mirage")
 
 
 if __name__ == '__main__':

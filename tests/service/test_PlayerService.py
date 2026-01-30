@@ -1,5 +1,3 @@
-from src.main.service.PlayerService import PlayerService
-from src.main.base.Player import Player
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -8,6 +6,9 @@ mock_mysql = MagicMock()
 sys.modules['mysql'] = mock_mysql
 sys.modules['mysql.connector'] = mock_mysql
 sys.modules['dotenv'] = MagicMock()
+
+from src.main.base.Player import Player  # noqa: E402
+from src.main.service.PlayerService import PlayerService  # noqa: E402
 
 
 class TestPlayerService(unittest.TestCase):
@@ -53,6 +54,18 @@ class TestPlayerService(unittest.TestCase):
         self.assertEqual(len(players), 2)
         self.assertEqual(players[0].name, "Ranie")
         self.assertEqual(players[1].name, "Lucas")
+
+    def test_search_players(self):
+        self.mock_model.search_by_nick.return_value = [
+            ("ranie",),
+            ("ranieri",)
+        ]
+
+        result = self.service.search_players("ran")
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], "ranie")
+        self.assertEqual(result[1], "ranieri")
 
 
 if __name__ == '__main__':

@@ -3,15 +3,27 @@ from discord.ext import commands
 from discord import app_commands
 
 from ..service.StatService import StatService
+from ..service.PlayerService import PlayerService
+from ..service.MapService import MapService
 
 
 class StatCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.stat_service = StatService()
+        self.player_service = PlayerService()
+        self.map_service = MapService()
+
+    async def player_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            nicks = self.player_service.search_players(current if current else "")
+            return [app_commands.Choice(name=nick, value=nick) for nick in nicks[:25]]
+        except Exception:
+            return []
 
     @app_commands.command(name='player-stats', description='Pegar stats de um jogador pelo Nick dele')
     @app_commands.describe(nick='Nick do Jogador')
+    @app_commands.autocomplete(nick=player_autocomplete)
     async def get_player_stat(self, interaction: discord.Interaction, nick: str):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:
@@ -78,8 +90,16 @@ class StatCommands(commands.Cog):
         except Exception as e:
             await interaction.followup.send(f'Erro ao buscar ranking: {e}', ephemeral=True)
 
+    async def map_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            maps = self.map_service.search_maps(current if current else "")
+            return [app_commands.Choice(name=map_name, value=map_name) for map_name in maps[:25]]
+        except Exception:
+            return []
+
     @app_commands.command(name='map-stats', description='Pegar stats detalhados de um mapa')
     @app_commands.describe(mapa='Nome do Mapa')
+    @app_commands.autocomplete(mapa=map_autocomplete)
     async def get_map_stats(self, interaction: discord.Interaction, mapa: str):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:

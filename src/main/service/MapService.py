@@ -47,3 +47,9 @@ class MapService:
 
     def delete(self, id: int):
         return self.model.delete(id)
+
+    def search_maps(self, term: str):
+        results = self.model.search_by_name(term)
+        if not results:
+            return []
+        return [row[0] for row in results]

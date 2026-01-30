@@ -35,3 +35,8 @@ class MapModel:
         query = "DELETE FROM map WHERE id = %s"
         params = (id,)
         return self.driver.delete(query, params)
+
+    def search_by_name(self, term: str, limit: int = 25):
+        query = "SELECT name FROM map WHERE name LIKE %s LIMIT %s"
+        params = (f"%{term}%", limit)
+        return self.driver.select_all(query, params)

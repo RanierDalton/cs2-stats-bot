@@ -50,8 +50,16 @@ class PlayerCommands(commands.Cog):
         except Exception as e:
             await interaction.followup.send(f'Erro ao atualizar jogador: {e}', ephemeral=True)
 
+    async def player_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            nicks = self.player_service.search_players(current if current else "")
+            return [app_commands.Choice(name=nick, value=nick) for nick in nicks[:25]]
+        except Exception:
+            return []
+
     @app_commands.command(name='get-player-id', description='Pegar o id de um player pelo nome ou nick')
     @app_commands.describe(name='Nome do Jogador', nick='Nick do Jogador')
+    @app_commands.autocomplete(nick=player_autocomplete)
     async def get_player_by_id(self, interaction: discord.Interaction, name: str = None, nick: str = None):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:

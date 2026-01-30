@@ -39,3 +39,8 @@ class PlayerModel:
         query = "DELETE FROM player WHERE id = %s"
         params = (id,)
         return self.driver.delete(query, params)
+
+    def search_by_nick(self, term: str, limit: int = 25):
+        query = "SELECT nick FROM player WHERE nick LIKE %s LIMIT %s"
+        params = (f"%{term}%", limit)
+        return self.driver.select_all(query, params)
