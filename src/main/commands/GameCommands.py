@@ -9,6 +9,7 @@ from ..mapper.StatMapper import StatMapper
 from ..service.PlayerService import PlayerService
 from ..service.MapService import MapService
 from ..service.StatService import StatService
+from ..base.Player import Player
 
 # A classe precisa herdar de commands.Cog
 class GameCommands(commands.Cog):
@@ -37,6 +38,7 @@ class GameCommands(commands.Cog):
                 f'Erro ao salvar a imagem: `{e}`', 
                 ephemeral=True
             )
+            return
 
         data = ImageDataLoader(caminho_local).analyse_scoreboard()
 
@@ -47,9 +49,16 @@ class GameCommands(commands.Cog):
             )
             return
         
-        mapa = MapService().get_id_by_name(mapa)
+        map_id = MapService().get_id_by_name(mapa)
 
-        game = GameMapper.from_dict(data=data, map_id=mapa)
+        if not map_id:
+            await interaction.followup.send(
+                f'Mapa informado "{mapa}" não consta no sistema.', 
+                ephemeral=True
+            )
+            return
+
+        game = GameMapper.from_dict(data=data, map_id=map_id)
         game_id = GameService().save_game(game)
 
         if not game_id:
@@ -59,23 +68,29 @@ class GameCommands(commands.Cog):
             )
             return
 
-        if not mapa:
-            await interaction.followup.send(
-                'Mapa informado não consta no sistema', 
-                ephemeral=True
-            )
-            return
-
-        game = GameMapper.from_dict(data=data, map_id=mapa)
-        game_id = GameService().save_game(game)
         stats = StatMapper.from_dict_list(data.get('players'), game_id=game_id)
+        player_service = PlayerService()
+        stat_service = StatService()
         
         for stat in stats:
-            player = PlayerService().get_player_by_nick(stat.player_nick)
+            player = player_service.get_player_by_nick(stat.player_nick)
+            
+            if not player:
+                # Auto-create player if not exists
+                # Using nick as name as fallback
+                try: 
+                    new_player = Player(None, stat.player_nick, stat.player_nick)
+                    player_service.save(new_player)
+                    # Retrieve again to get ID
+                    player = player_service.get_player_by_nick(stat.player_nick)
+                except Exception as e:
+                    print(f"Erro ao criar jogador automaticamente: {e}")
+                    continue # Skip stat save if player creation fails
+            
             if player:
                 stat.fk_player = player.id
                 stat.fk_game = game_id
-                StatService().save_stat(stat)
+                stat_service.save_stat(stat)
 
         await interaction.followup.send(
             f'Jogo e estatísticas salvos com sucesso! Com o ID: {game_id}',
@@ -86,8 +101,21 @@ class GameCommands(commands.Cog):
     @app_commands.describe(id='Id do Jogo')
     async def delete_game(self, interaction: discord.Interaction, id: int):
         await interaction.response.defer(thinking=True, ephemeral=False)
-        # TODO - implementar funcionalidade 
-        await interaction.followup.send(
-            f'Funcionalidade ainda não implementada, fale com o @Ranier.', 
-            ephemeral=False
-        )
+        try:
+            game_service = GameService()
+            game = game_service.get_game_by_id(id)
+            if not game:
+                await interaction.followup.send(f'Jogo com ID {id} não encontrado.', ephemeral=True)
+                return
+            
+            game_service.delete_game(id)
+            
+            await interaction.followup.send(
+                f'Jogo com ID {id} deletado com sucesso.', 
+                ephemeral=False
+            )
+        except Exception as e:
+            await interaction.followup.send(
+                f'Erro ao deletar jogo: {e}', 
+                ephemeral=True
+            )

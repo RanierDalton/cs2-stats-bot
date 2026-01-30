@@ -44,7 +44,25 @@ Suba os containers, construindo a imagem do bot a partir do **Dockerfile**:
 
 ```bash
 docker compose up --build -d
-````
+```
+
+#### 2.1 Apenas o Banco de Dados (Docker Run)
+
+Caso deseje rodar o banco de dados de forma isolada (útil para desenvolvimento local do bot fora do container). 
+
+> [!IMPORTANT]
+> **Você deve executar o comando abaixo de dentro da pasta raiz do projeto (`cs2-stats-bot`)**. Caso contrário, o Docker poderá criar um diretório vazio em vez de usar o arquivo `db.sql`.
+
+No terminal (dentro da pasta `cs2-stats-bot`):
+
+```bash
+# Se estiver no Linux/macOS ou PowerShell (Windows)
+docker run --name mysql-db -v "${PWD}/db.sql:/docker-entrypoint-initdb.d/init.sql" -e MYSQL_ROOT_PASSWORD=senha_secreta -e MYSQL_DATABASE=cs_stats -p 3306:3306 -d mysql:8.0
+```
+
+> [!NOTE]
+> O arquivo `db.sql` é mapeado como volume e executado automaticamente pelo MySQL na inicialização do container. Se houver erro de "batch_readline", verifique se você não está tentando montar um diretório em vez do arquivo SQL.
+
 
 Para ver os logs do bot:
 

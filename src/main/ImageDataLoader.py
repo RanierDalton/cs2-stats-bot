@@ -34,7 +34,7 @@ class ImageDataLoader:
                         type=types.Type.OBJECT,
                         properties={
                             "nick": types.Schema(type=types.Type.STRING, description="Nome de usuário do jogador."),
-                            "kda": types.Schema(type=types.Type.STRING, description="O número grande de Kills na carta do jogador."),
+                            "kda": types.Schema(type=types.Type.STRING, description="Stats de Kills/Deaths/Assists exatamente no formato 'K/D/A' (ex: '15/5/3')."),
                             "tag": types.Schema(type=types.Type.STRING, description="A primeira estatística descritiva (ex: 'Matador quádruplo')."),
                             "hs": types.Schema(type=types.Type.STRING, description="A porcentagem que aparece (ex: '57%')."),
                             "damage": types.Schema(type=types.Type.STRING, description="O número em destaque no canto superior do card (ex: 103 ou 56)."),

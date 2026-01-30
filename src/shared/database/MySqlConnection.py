@@ -7,9 +7,10 @@ load_dotenv()
 class MySqlConnection(DBConnection):
     def __init__(self):
         self._host = os.getenv("DB_HOST")
+        self._port = os.getenv("DB_PORT", 3306)
         self._user = os.getenv("DB_USER")
         self._password = os.getenv("DB_PASSWORD")
-        self._database = os.getenv("DB_DATABASE")
+        self._database = os.getenv("DB_NAME")
         self._connection = None
         self._cursor = None
         self.connect()
@@ -18,6 +19,7 @@ class MySqlConnection(DBConnection):
         if self._connection is None or not self._connection.is_connected():
             self._connection = mysql.connect(
                 host=self._host,
+                port=self._port,
                 user=self._user,
                 password=self._password,
                 database=self._database

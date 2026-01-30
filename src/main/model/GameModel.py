@@ -12,3 +12,13 @@ class GameModel:
         """
         params = (game.date, game.allies_rounds, game.adversary_rounds, game.map_id, game.status)
         return self.driver.insert(query, params)
+
+    def delete(self, id: int):
+        query = "DELETE FROM game WHERE id = %s"
+        params = (id,)
+        return self.driver.delete(query, params)
+    
+    def get_by_id(self, id: int):
+        query = "SELECT * FROM game WHERE id = %s"
+        params = (id,)
+        return self.driver.select(query, params)
