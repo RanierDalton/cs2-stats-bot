@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - main
+      - development
 
   # Permitir execução manual
   workflow_dispatch:
