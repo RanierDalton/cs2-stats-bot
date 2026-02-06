@@ -123,67 +123,70 @@ Para corrigir automaticamente espaços, indentação e outros erros de estilo:
 autopep8 --in-place --recursive --aggressive .
 ```
 
+
 -----
 
-## 🚀 Build e Deploy em Produção
+## 🚀 Deploy em Produção na AWS
 
-Os scripts a seguir automatizam a preparação de um ambiente Linux (Ubuntu) para o deploy.
+O projeto possui infraestrutura automatizada para deploy na AWS usando **Terraform** e **GitHub Actions (CI/CD)**.
 
-### 1\. Script de Deploy do Bot (com Docker Compose)
+### Recursos de Infraestrutura
 
-Este script instala o Docker/Docker Compose, clona o repositório e inicia a aplicação orquestrada.
+- **Terraform**: Infraestrutura como código para AWS (EC2, Security Groups, Elastic IP)
+- **Docker Compose**: Orquestração de containers (Bot, MySQL, Nginx)
+- **Nginx**: Reverse proxy com HTTPS (Let's Encrypt)
+- **CI/CD**: Pipeline automatizado com GitHub Actions
 
-Crie um arquivo chamado **`deploy_bot.sh`**:
-
-```bash
-#!/bin/bash
-set -e
-
-# Atualiza e instala utilitários básicos
-sudo apt-get update -y
-sudo apt-get install ca-certificates curl git -y
-
-# Instala o Docker
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-
-# Adiciona o usuário atual ao grupo docker
-sudo usermod -aG docker "$USER"
-echo "AVISO: Faça logout/login ou execute 'newgrp docker' para aplicar as permissões."
-
-cd /home/$USER
-docker compose up --build -d
-
-echo "Deploy da Aplicação concluído. Containers rodando."
-```
-
-### 2\. Script de Configuração do Banco de Dados MySQL (Alternativa Sem Docker)
-
-Use esta alternativa se não for usar o MySQL via Docker Compose.
-
-Crie um arquivo chamado **`setup_db_host.sh`**:
+### Quick Start
 
 ```bash
-#!/bin/bash
-set -e
+# 1. Configurar Terraform
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edite terraform.tfvars com suas credenciais
 
-# Inicia e habilita o serviço MySQL
-sudo systemctl start mysql
-sudo systemctl enable mysql
+# 2. Deploy da infraestrutura
+terraform init
+terraform plan
+terraform apply
 
-# Clonagem do repositório contendo o script SQL
-git clone https://github.com/InfraWatch-inc/database.git
-
-# Aplica o script SQL para criar o DB e as tabelas
-sudo mysql < database/script.sql
-
-echo "Banco de dados 'cs_stats' configurado."
+# 3. Configurar SSL (após deploy)
+ssh -i ~/.ssh/sua-chave.pem ubuntu@SEU_IP
+cd /home/ubuntu/cs2-stats-bot
+bash scripts/setup-ssl.sh
 ```
+
+### Documentação Completa
+
+Para guia detalhado de deployment, consulte:
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Guia completo de deployment AWS
+- **[terraform/README.md](terraform/README.md)** - Documentação Terraform
+
+### Estrutura de Infraestrutura
+
+```
+.
+├── terraform/          # Infraestrutura como código (AWS)
+│   ├── main.tf        # Recursos AWS
+│   ├── variables.tf   # Variáveis configuráveis
+│   └── outputs.tf     # Outputs do deploy
+├── nginx/             # Configuração do servidor web
+│   ├── nginx.conf     # Config HTTPS/SSL
+│   └── Dockerfile     # Image nginx + Certbot
+├── scripts/           # Scripts de automação
+│   ├── deploy.sh      # Deploy/atualização
+│   └── setup-ssl.sh   # Configuração SSL
+├── .github/workflows/ # CI/CD Pipelines
+│   ├── ci.yml        # Testes e lint
+│   └── cd.yml        # Deploy automático
+└── docs/              # Documentação
+    └── DEPLOYMENT.md  # Guia completo
+```
+
+### CI/CD Automatizado
+
+O projeto possui pipelines GitHub Actions:
+- **CI**: Executa em cada push/PR - testes, linting, build Docker
+- **CD**: Executa após CI passar - deploy automático na AWS
+
+Ver workflows em [`.github/workflows/`](.github/workflows/)
