@@ -27,9 +27,26 @@ class GameCommands(commands.Cog):
             return []
 
     @app_commands.command(name='save-game', description='Cadastrar um jogo')
-    @app_commands.describe(imagem='Imagem do Final da Partida', mapa='Nome do Mapa')
+    @app_commands.describe(
+        imagem='Imagem do Final da Partida', 
+        mapa='Nome do Mapa',
+        placar='(Opcional) Placar do jogo no formato X-Y (ex: 13-10). Use se a imagem estiver ruim.',
+        status='(Opcional) Status do jogo: win, lose ou draw. Use se a imagem estiver ruim.'
+    )
     @app_commands.autocomplete(mapa=map_autocomplete)
-    async def save_game(self, interaction: discord.Interaction, imagem: discord.Attachment, mapa: str):
+    @app_commands.choices(status=[
+        app_commands.Choice(name='Vitória', value='win'),
+        app_commands.Choice(name='Derrota', value='lose'),
+        app_commands.Choice(name='Empate', value='draw')
+    ])
+    async def save_game(
+        self, 
+        interaction: discord.Interaction, 
+        imagem: discord.Attachment, 
+        mapa: str,
+        placar: str = None,
+        status: str = None
+    ):
         if not imagem.content_type.startswith('image/'):
             await interaction.followup.send(
                 f'Ops! O anexo precisa ser uma imagem (recebido: `{imagem.content_type}`).',
@@ -51,14 +68,43 @@ class GameCommands(commands.Cog):
             )
             return
 
-        data = ImageDataLoader(caminho_local).analyse_scoreboard()
+        # Try to analyze the image
+        data = await ImageDataLoader(caminho_local).analyse_scoreboard()
 
-        if not data:
+        # Use manual parameters if provided, otherwise use image analysis data
+        score_final = placar if placar else (data.get('score', '') if data else '')
+        status_final = status if status else (data.get('status', '') if data else '')
+        
+        # Validate that we have the critical data (score and status)
+        if not score_final or not status_final:
+            missing = []
+            if not score_final:
+                missing.append('placar')
+            if not status_final:
+                missing.append('status')
+            
             await interaction.followup.send(
-                'Desculpe, não consegui analisar a imagem. Tente novamente com uma imagem mais clara.',
+                f'❌ Não consegui extrair o **{" e ".join(missing)}** da imagem.\n\n'
+                f'Por favor, execute o comando novamente informando manualmente:\n'
+                f'• `placar`: formato X-Y (ex: 13-10)\n'
+                f'• `status`: escolha Vitória, Derrota ou Empate\n\n'
+                f'Exemplo: `/save-game imagem:<arquivo> mapa:{mapa} placar:13-10 status:Vitória`',
                 ephemeral=True
             )
             return
+        
+        # If we didn't get player data from image but have score/status, that's still an issue
+        if not data or not data.get('players'):
+            await interaction.followup.send(
+                '❌ Não consegui extrair os dados dos **jogadores** da imagem.\n'
+                'Por favor, tente com uma imagem mais clara ou com melhor resolução.',
+                ephemeral=True
+            )
+            return
+        
+        # Update data dict with final score and status
+        data['score'] = score_final
+        data['status'] = status_final
 
         map_id = MapService().get_id_by_name(mapa)
 
@@ -69,7 +115,14 @@ class GameCommands(commands.Cog):
             )
             return
 
-        game = GameMapper.from_dict(data=data, map_id=map_id)
+        try:
+            game = GameMapper.from_dict(data=data, map_id=map_id)
+        except ValueError as e:
+            await interaction.followup.send(
+                f'Erro ao processar dados do jogo: {str(e)}',
+                ephemeral=True
+            )
+            return
         game_id = GameService().save_game(game)
 
         if not game_id:
@@ -82,31 +135,32 @@ class GameCommands(commands.Cog):
         stats = StatMapper.from_dict_list(data.get('players'), game_id=game_id)
         player_service = PlayerService()
         stat_service = StatService()
+        
+        saved_count = 0
+        skipped_players = []
 
         for stat in stats:
             player = player_service.get_player_by_nick(stat.player_nick)
-
-            if not player:
-                # Auto-create player if not exists
-                # Using nick as name as fallback
-                try:
-                    new_player = Player(None, stat.player_nick, stat.player_nick)
-                    player_service.save(new_player)
-                    # Retrieve again to get ID
-                    player = player_service.get_player_by_nick(stat.player_nick)
-                except Exception as e:
-                    print(f"Erro ao criar jogador automaticamente: {e}")
-                    continue  # Skip stat save if player creation fails
 
             if player:
                 stat.fk_player = player.id
                 stat.fk_game = game_id
                 stat_service.save_stat(stat)
+                saved_count += 1
+            else:
+                # Skip stats for unregistered players
+                skipped_players.append(stat.player_nick)
 
-        await interaction.followup.send(
-            f'Jogo e estatísticas salvos com sucesso! Com o ID: {game_id}',
-            ephemeral=False
-        )
+        # Build success message
+        message = f'✅ Jogo salvo com sucesso! ID: {game_id}\n'
+        message += f'📊 Estatísticas salvas: {saved_count}/{len(stats)} jogadores'
+        
+        if skipped_players:
+            message += f'\n\n⚠️ Jogadores não registrados (estatísticas ignoradas):\n'
+            message += '\n'.join([f'• `{nick}`' for nick in skipped_players])
+            message += '\n\n💡 Use `/register-player` para cadastrar jogadores antes de salvar jogos.'
+
+        await interaction.followup.send(message, ephemeral=False)
 
     @app_commands.command(name='delete-game', description='Deletar um jogo')
     @app_commands.describe(id='Id do Jogo')

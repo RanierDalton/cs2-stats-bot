@@ -23,9 +23,15 @@ class MySqlConnection(DBConnection):
                 port=self._port,
                 user=self._user,
                 password=self._password,
-                database=self._database
+                database=self._database,
+                charset='utf8mb4',
+                use_unicode=True
             )
             self._cursor = self._connection.cursor()
+            # Force UTF-8 for the connection
+            self._cursor.execute("SET NAMES utf8mb4")
+            self._cursor.execute("SET CHARACTER SET utf8mb4")
+            self._cursor.execute("SET character_set_connection=utf8mb4")
 
     def disconnect(self):
         if self.connection.is_connected():

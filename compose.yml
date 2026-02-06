@@ -5,8 +5,9 @@ services:
     image: mysql:8.0
     container_name: db
     restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
@@ -15,15 +16,20 @@ services:
       - ./db.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
-  
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}" ]
+      timeout: 5s
+      retries: 10
+
   bot:
     build: .
     container_name: bot
     restart: always
     env_file:
-      - .env 
+      - .env
     depends_on:
-      - db
-    
+      db:
+        condition: service_healthy
+
 volumes:
   db_data:
