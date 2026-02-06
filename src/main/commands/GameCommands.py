@@ -9,6 +9,7 @@ from ..mapper.StatMapper import StatMapper
 from ..service.PlayerService import PlayerService
 from ..service.MapService import MapService
 from ..service.StatService import StatService
+from ..service.ImageService import ImageService
 from ..base.Player import Player
 
 # A classe precisa herdar de commands.Cog
@@ -123,6 +124,24 @@ class GameCommands(commands.Cog):
                 ephemeral=True
             )
             return
+
+        uploaded_image = None
+        try:
+            with open(caminho_local, 'rb') as f:
+                file_bytes = f.read()
+
+            image_service = ImageService()
+            uploaded_image = image_service.upload_image(
+                file_data=file_bytes,
+                original_filename=nome_arquivo,
+                content_type=imagem.content_type
+            )
+
+            if uploaded_image:
+                game.set_image_id(uploaded_image.id)
+        except Exception as e:
+            print(f"Erro ao fazer upload para MinIO: {e}")
+
         game_id = GameService().save_game(game)
 
         if not game_id:

@@ -16,6 +16,22 @@ CREATE TABLE map (
     is_active TINYINT NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Imagens
+CREATE TABLE image (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_hash VARCHAR(64) NOT NULL UNIQUE,
+    actual_name VARCHAR(255) NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    relative_path VARCHAR(500) NOT NULL,
+    full_path VARCHAR(1000) NOT NULL,
+    file_size BIGINT NOT NULL,
+    mime_type VARCHAR(100),
+    bucket_name VARCHAR(100) NOT NULL DEFAULT 'cs2-images',
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_file_hash (file_hash)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Partidas
 CREATE TABLE game (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -24,8 +40,10 @@ CREATE TABLE game (
     adversary_rounds INT,
     allies_rounds INT,
     fk_map INT NOT NULL,
+    fk_image INT DEFAULT NULL,
     
-    FOREIGN KEY (fk_map) REFERENCES map(id)
+    FOREIGN KEY (fk_map) REFERENCES map(id),
+    FOREIGN KEY (fk_image) REFERENCES image(id) ON DELETE SET NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Estatísticas individuais
