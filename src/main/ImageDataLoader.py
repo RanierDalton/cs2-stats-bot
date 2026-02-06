@@ -54,9 +54,13 @@ class ImageDataLoader:
         except FileNotFoundError:
             return None
 
-    def analyse_scoreboard(self):
+    async def analyse_scoreboard(self):
+        """Async wrapper to analyze scoreboard without blocking event loop"""
         try:
-            response = self.client.models.generate_content(
+            # Run the blocking API call in a thread pool to avoid blocking the event loop
+            import asyncio
+            response = await asyncio.to_thread(
+                self.client.models.generate_content,
                 model='gemini-2.5-flash',
                 contents=[self.prompt, self.img],
                 config=types.GenerateContentConfig(

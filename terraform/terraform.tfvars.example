@@ -1,0 +1,25 @@
+# Exemplo de arquivo terraform.tfvars
+# Copie este arquivo para terraform.tfvars e preencha os valores
+
+# Configurações AWS
+aws_region    = "us-east-1"
+instance_type = "t2.micro"
+environment   = "prod"
+
+# Chave SSH (deve existir na AWS)
+key_name = "my-ec2-key"
+
+# Segurança SSH - RESTRINJA PARA SEU IP!
+allowed_ssh_cidr = ["0.0.0.0/0"]  # Exemplo: ["123.456.789.0/32"]
+
+# Domínio e SSL (opcional)
+domain_name = ""  # Exemplo: "bot.meudominio.com"
+ssl_email   = ""  # Exemplo: "seu-email@example.com"
+
+# Secrets - NUNCA COMMITE ESTE ARQUIVO!
+bot_token        = "seu-token-discord-aqui"
+gemini_api_key   = "sua-chave-gemini-aqui"
+db_root_password = "senha-root-segura"
+db_user          = "cs_user"
+db_password      = "senha-user-segura"
+db_name          = "cs_stats"

@@ -8,10 +8,17 @@ class GameModel:
 
     def create(self, game: Game) -> int:
         query = """
-        INSERT INTO game (dt, allies_rounds, adversary_rounds, fk_map, status)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO game (dt, allies_rounds, adversary_rounds, fk_map, status, fk_image)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """
-        params = (game.date, game.allies_rounds, game.adversary_rounds, game.map_id, game.status)
+        params = (
+            game.date,
+            game.allies_rounds,
+            game.adversary_rounds,
+            game.map_id,
+            game.status,
+            game.image_id if hasattr(game, '_image_id') and game.image_id else None
+        )
         return self.driver.insert(query, params)
 
     def delete(self, id: int):

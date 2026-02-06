@@ -2,13 +2,14 @@ from datetime import datetime
 
 
 class Game:
-    def __init__(self, id=None, date=None, allies_rounds=None, adversary_rounds=None, map_id: int = 1, status='win'):
+    def __init__(self, id=None, date=None, allies_rounds=None, adversary_rounds=None, map_id: int = 1, status='win', image_id=None):
         self._id = id
         self.status = status
         self._date = date if date else datetime.now()
         self._allies_rounds = allies_rounds
         self._adversary_rounds = adversary_rounds
         self._map_id = map_id
+        self._image_id = image_id
 
     def set_id(self, id):
 
@@ -52,3 +53,10 @@ class Game:
     @property
     def map_id(self):
         return self._map_id
+
+    @property
+    def image_id(self):
+        return self._image_id
+
+    def set_image_id(self, image_id):
+        self._image_id = image_id

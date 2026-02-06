@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS cs_stats;
-CREATE DATABASE cs_stats;
+CREATE DATABASE cs_stats CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE cs_stats;
 
 -- Jogadores
@@ -7,14 +7,30 @@ CREATE TABLE player (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     nick VARCHAR(60) NOT NULL
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Mapas
 CREATE TABLE map (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     is_active TINYINT NOT NULL
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Imagens
+CREATE TABLE image (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_hash VARCHAR(64) NOT NULL UNIQUE,
+    actual_name VARCHAR(255) NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    relative_path VARCHAR(500) NOT NULL,
+    full_path VARCHAR(1000) NOT NULL,
+    file_size BIGINT NOT NULL,
+    mime_type VARCHAR(100),
+    bucket_name VARCHAR(100) NOT NULL DEFAULT 'cs2-images',
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_file_hash (file_hash)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Partidas
 CREATE TABLE game (
@@ -24,9 +40,11 @@ CREATE TABLE game (
     adversary_rounds INT,
     allies_rounds INT,
     fk_map INT NOT NULL,
+    fk_image INT DEFAULT NULL,
     
-    FOREIGN KEY (fk_map) REFERENCES map(id)
-);
+    FOREIGN KEY (fk_map) REFERENCES map(id),
+    FOREIGN KEY (fk_image) REFERENCES image(id) ON DELETE SET NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Estatísticas individuais
 CREATE TABLE game_data (
@@ -42,14 +60,14 @@ CREATE TABLE game_data (
     
     FOREIGN KEY (fk_player) REFERENCES player(id),
     FOREIGN KEY (fk_game) REFERENCES game(id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO player (name, nick) VALUES
-('Lucas', 'Lucas Foguetes ツ'), 
+('Lucas', UNHEX('4C7563617320466F67756574657320E38384')),  -- Lucas Foguetes ツ
 ('Iago', 'Mr.Azeitona'),         
 ('Ranier', 'raynier'),                 
-('Tu-π', 'Tu-π'),                        
-('Dnailo', 'Латинский алфави'), 
+('Tu-π', UNHEX('54752DCF80')),  -- Tu-π
+('Dnailo', UNHEX('D09BD0B0D182D0B8D0BDD181D0BAD0B8D0B920D0B0D0BBD184D0B0D0B2D0B8')),  -- Латинский алфави
 ('Biel', 'setter'),                   
 ('João Bahia', 'Khalid Kashmiri'); 
 
@@ -64,45 +82,45 @@ INSERT INTO map (name, is_active) VALUES
 ('Train', 1),
 ('Vertigo', 1);      
 
--- INSERT INTO game (dt, status, adversary_rounds, allies_rounds, fk_map) VALUES
--- ('2025-09-25 19:26:44', 'win',  4, 13, 1),    
--- ('2025-09-25 19:42:43', 'draw', 12, 12, 2), 
--- ('2025-09-25 21:05:04', 'win',  9, 13, 3),   
--- ('2025-09-25 21:24:43', 'win',  11, 13, 4),   
--- ('2025-09-25 21:43:24', 'draw', 12, 12, 5);   
+INSERT INTO game (dt, status, adversary_rounds, allies_rounds, fk_map) VALUES
+('2025-09-25 19:26:44', 'win',  4, 13, 1),    
+('2025-09-25 19:42:43', 'draw', 12, 12, 2), 
+('2025-09-25 21:05:04', 'win',  9, 13, 3),   
+('2025-09-25 21:24:43', 'win',  11, 13, 4),   
+('2025-09-25 21:43:24', 'draw', 12, 12, 5);   
 
--- -- Partida 1 (Vitória - Inferno)
--- INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
--- (1, 1, 25, 16, 2, 0, 0), 
--- (2, 1, 18, 11, 3, 0, 0), 
--- (3, 1, 29, 7, 2, 0, 0), 
--- (4, 1, 18, 10, 2, 0, 0),
--- (5, 1, 11, 14, 2, 0, 0); 
+-- Partida 1 (Vitória - Inferno)
+INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
+(1, 1, 25, 16, 2, 0, 0), 
+(2, 1, 18, 11, 3, 0, 0), 
+(3, 1, 29, 7, 2, 0, 0), 
+(4, 1, 18, 10, 2, 0, 0),
+(5, 1, 11, 14, 2, 0, 0); 
 
--- INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
--- (1, 2, 29, 16, 0, 0, 0), 
--- (3, 2, 26, 18, 2, 0, 0), 
--- (5, 2, 22, 14, 2, 0, 0), 
--- (6, 2, 10, 10, 1, 0, 0),
--- (2, 2, 18, 16, 1, 0, 0); 
+INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
+(1, 2, 29, 16, 0, 0, 0), 
+(3, 2, 26, 18, 2, 0, 0), 
+(5, 2, 22, 14, 2, 0, 0), 
+(6, 2, 10, 10, 1, 0, 0),
+(2, 2, 18, 16, 1, 0, 0); 
 
--- INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
--- (1, 3, 26, 12, 0, 0, 0), 
--- (2, 3, 19, 10, 0, 0, 0), 
--- (3, 3, 23, 14, 0, 0, 0),
--- (7, 3, 14, 11, 0, 0, 0), 
--- (6, 3, 9, 14, 0, 0, 0);  
+INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
+(1, 3, 26, 12, 0, 0, 0), 
+(2, 3, 19, 10, 0, 0, 0), 
+(3, 3, 23, 14, 0, 0, 0),
+(7, 3, 14, 11, 0, 0, 0), 
+(6, 3, 9, 14, 0, 0, 0);  
 
--- INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
--- (1, 4, 28, 14, 1, 0, 0),
--- (3, 4, 25, 12, 1, 0, 0), 
--- (2, 4, 24, 16, 0, 0, 0), 
--- (4, 4, 16, 16, 0, 0, 0),
--- (5, 4, 18, 14, 0, 0, 0); 
+INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
+(1, 4, 28, 14, 1, 0, 0),
+(3, 4, 25, 12, 1, 0, 0), 
+(2, 4, 24, 16, 0, 0, 0), 
+(4, 4, 16, 16, 0, 0, 0),
+(5, 4, 18, 14, 0, 0, 0); 
 
--- INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
--- (1, 5, 16, 10, 1, 0, 0), 
--- (2, 5, 22, 12, 2, 0, 0), 
--- (3, 5, 23, 13, 0, 0, 0), 
--- (6, 5, 14, 13, 0, 0, 0), 
--- (7, 5, 10, 11, 0, 0, 0); 
+INSERT INTO game_data (fk_player, fk_game, kills, deaths, assists, headshot, damage) VALUES
+(1, 5, 16, 10, 1, 0, 0), 
+(2, 5, 22, 12, 2, 0, 0), 
+(3, 5, 23, 13, 0, 0, 0), 
+(6, 5, 14, 13, 0, 0, 0), 
+(7, 5, 10, 11, 0, 0, 0); 

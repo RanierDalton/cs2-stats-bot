@@ -1,0 +1,116 @@
+name: CD - Deploy to AWS
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - development
+
+  # Permitir execução manual
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Só executar se o CI passou
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Deploy da infraestrutura Terraform (comentado por padrão)
+    # Descomente quando estiver pronto para deploy automático
+    # - name: Setup Terraform
+    #   uses: hashicorp/setup-terraform@v3
+    #   with:
+    #     terraform_version: 1.6.0
+    # 
+    # - name: Configure AWS Credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-east-1
+    # 
+    # - name: Terraform Init
+    #   working-directory: ./terraform
+    #   run: terraform init
+    # 
+    # - name: Terraform Plan
+    #   working-directory: ./terraform
+    #   run: |
+    #     terraform plan \
+    #       -var="bot_token=${{ secrets.BOT_TOKEN }}" \
+    #       -var="gemini_api_key=${{ secrets.GEMINI_API_KEY }}" \
+    #       -var="db_root_password=${{ secrets.DB_ROOT_PASSWORD }}" \
+    #       -var="db_password=${{ secrets.DB_PASSWORD }}" \
+    #       -var="key_name=${{ secrets.EC2_KEY_NAME }}"
+    # 
+    # - name: Terraform Apply
+    #   working-directory: ./terraform
+    #   run: |
+    #     terraform apply -auto-approve \
+    #       -var="bot_token=${{ secrets.BOT_TOKEN }}" \
+    #       -var="gemini_api_key=${{ secrets.GEMINI_API_KEY }}" \
+    #       -var="db_root_password=${{ secrets.DB_ROOT_PASSWORD }}" \
+    #       -var="db_password=${{ secrets.DB_PASSWORD }}" \
+    #       -var="key_name=${{ secrets.EC2_KEY_NAME }}"
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/cs2-stats-bot
+          
+          # Atualizar variáveis de ambiente
+          cat > .env << EOF
+          BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          DB_HOST=db
+          DB_PORT=3306
+          DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          EOF
+          
+          # Executar script de deploy
+          bash scripts/deploy.sh
+
+    - name: Verify Deployment
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/cs2-stats-bot
+          
+          # Verificar se containers estão rodando
+          if docker compose ps | grep -q "Up"; then
+            echo "✓ Deploy bem-sucedido! Containers estão rodando."
+            docker compose ps
+          else
+            echo "✗ ERRO: Deploy falhou. Containers não estão rodando."
+            docker compose logs --tail=50
+            exit 1
+          fi
+
+    - name: Notify on Success
+      if: success()
+      run: |
+        echo "🚀 Deploy concluído com sucesso!"
+        echo "Bot está rodando em: ${{ secrets.EC2_HOST }}"
+
+    - name: Notify on Failure
+      if: failure()
+      run: |
+        echo "✗ Deploy falhou. Verifique os logs acima."
+        exit 1
