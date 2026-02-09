@@ -10,13 +10,11 @@ from ..service.MapService import MapService
 class StatCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.stat_service = StatService()
-        self.player_service = PlayerService()
-        self.map_service = MapService()
 
     async def player_autocomplete(self, interaction: discord.Interaction, current: str):
         try:
-            nicks = self.player_service.search_players(current if current else "")
+            player_service = PlayerService()
+            nicks = player_service.search_players(current if current else "")
             return [app_commands.Choice(name=nick, value=nick) for nick in nicks[:25]]
         except Exception:
             return []
@@ -27,7 +25,8 @@ class StatCommands(commands.Cog):
     async def get_player_stat(self, interaction: discord.Interaction, nick: str):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:
-            stats = self.stat_service.get_player_stats(nick)
+            stat_service = StatService()
+            stats = stat_service.get_player_stats(nick)
 
             if not stats:
                 await interaction.followup.send(f'Nenhuma estatística encontrada para o jogador **{nick}**.', ephemeral=True)
@@ -60,7 +59,8 @@ class StatCommands(commands.Cog):
 
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:
-            players_stats = self.stat_service.get_all_players_stats()
+            stat_service = StatService()
+            players_stats = stat_service.get_all_players_stats()
 
             if not players_stats:
                 await interaction.followup.send("Nenhum dado encontrado.", ephemeral=True)
@@ -90,9 +90,11 @@ class StatCommands(commands.Cog):
         except Exception as e:
             await interaction.followup.send(f'Erro ao buscar ranking: {e}', ephemeral=True)
 
+
     async def map_autocomplete(self, interaction: discord.Interaction, current: str):
         try:
-            maps = self.map_service.search_maps(current if current else "")
+            map_service = MapService()
+            maps = map_service.search_maps(current if current else "")
             return [app_commands.Choice(name=map_name, value=map_name) for map_name in maps[:25]]
         except Exception:
             return []
@@ -103,7 +105,8 @@ class StatCommands(commands.Cog):
     async def get_map_stats(self, interaction: discord.Interaction, mapa: str):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:
-            stats = self.stat_service.get_map_stats(mapa)
+            stat_service = StatService()
+            stats = stat_service.get_map_stats(mapa)
 
             if not stats:
                 await interaction.followup.send(f'Nenhuma estatística encontrada para o mapa **{mapa}**.', ephemeral=True)
@@ -133,7 +136,7 @@ class StatCommands(commands.Cog):
             await interaction.followup.send(f'Erro ao buscar stats do mapa: {e}', ephemeral=True)
 
     @app_commands.command(name='get-all-maps-stats', description='Mostra ranking de mapas mais jogados.')
-    @app_commands.describe(ordenar_por='Critério de ordenação')
+    @app_commands.describe(ordenar_por='Critário de ordenação')
     @app_commands.choices(ordenar_por=[
         app_commands.Choice(name="Jogos", value="games"),
         app_commands.Choice(name="Win Rate", value="win_rate")
@@ -141,7 +144,8 @@ class StatCommands(commands.Cog):
     async def get_all_maps_stats(self, interaction: discord.Interaction, ordenar_por: str = 'games'):
         await interaction.response.defer(thinking=True, ephemeral=False)
         try:
-            maps_stats = self.stat_service.get_all_maps_stats(ordenar_por)
+            stat_service = StatService()
+            maps_stats = stat_service.get_all_maps_stats(ordenar_por)
             if not maps_stats:
                 await interaction.followup.send("Nenhum dado encontrado.", ephemeral=True)
                 return
@@ -173,3 +177,4 @@ class StatCommands(commands.Cog):
 
         except Exception as e:
             await interaction.followup.send(f'Erro ao buscar ranking de mapas: {e}', ephemeral=True)
+

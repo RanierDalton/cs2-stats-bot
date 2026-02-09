@@ -31,29 +31,29 @@ with Diagram(
     graph_attr=graph_attr,
     outformat="png"
 ):
-    
+
     users = Discord("Usuários Discord")
-    
+
     with Cluster("AWS Cloud"):
         ec2 = EC2("EC2 Instance\nt3.medium")
-        
+
         with Cluster("Docker Compose\n(dentro da EC2)", graph_attr={"bgcolor": "lightblue"}):
-            
+
             with Cluster("Containers (bot_network)"):
                 nginx = Nginx("Nginx\nReverse Proxy + SSL")
                 bot = Python("Discord Bot\nOCR + Gemini AI")
                 mysql = MySQL("MySQL 8.0")
                 minio = Docker("MinIO\nImage Storage")
-            
+
             with Cluster("Docker Volumes"):
                 vol_db = Docker("db_data")
                 vol_minio = Docker("minio_data")
                 vol_ssl = Docker("letsencrypt")
-    
+
     users >> Edge(label="HTTPS/WSS") >> ec2
     ec2 >> Edge(label="") >> nginx
     nginx >> Edge(label="proxy") >> bot
-    
+
     bot >> Edge(label="SQL") >> mysql
     bot >> Edge(label="upload img") >> minio
     bot >> Edge(label="Discord API", style="dashed") >> users

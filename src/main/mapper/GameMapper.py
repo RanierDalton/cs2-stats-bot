@@ -15,19 +15,19 @@ class GameMapper:
     @staticmethod
     def from_dict(data, map_id: int):
         score = data.get('score', '')
-        
+
         # Validate score format
         if not score or '-' not in score:
             raise ValueError(f"Score inválido: '{score}'. Esperado formato 'X-Y' (ex: '13-10')")
-        
+
         score_parts = score.split('-')
-        
+
         if len(score_parts) != 2:
             raise ValueError(f"Score inválido: '{score}'. Esperado formato 'X-Y' (ex: '13-10')")
-        
+
         allies_rounds = score_parts[0].strip()
         adversary_rounds = score_parts[1].strip()
-        
+
         # Validate that both parts are numeric
         if not allies_rounds.isdigit() or not adversary_rounds.isdigit():
             raise ValueError(f"Score inválido: '{score}'. Rounds devem ser números inteiros.")

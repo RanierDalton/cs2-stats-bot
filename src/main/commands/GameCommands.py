@@ -10,9 +10,6 @@ from ..service.PlayerService import PlayerService
 from ..service.MapService import MapService
 from ..service.StatService import StatService
 from ..service.ImageService import ImageService
-from ..base.Player import Player
-
-# A classe precisa herdar de commands.Cog
 
 
 class GameCommands(commands.Cog):
@@ -29,7 +26,7 @@ class GameCommands(commands.Cog):
 
     @app_commands.command(name='save-game', description='Cadastrar um jogo')
     @app_commands.describe(
-        imagem='Imagem do Final da Partida', 
+        imagem='Imagem do Final da Partida',
         mapa='Nome do Mapa',
         placar='(Opcional) Placar do jogo no formato X-Y (ex: 13-10). Use se a imagem estiver ruim.',
         status='(Opcional) Status do jogo: win, lose ou draw. Use se a imagem estiver ruim.'
@@ -41,9 +38,9 @@ class GameCommands(commands.Cog):
         app_commands.Choice(name='Empate', value='draw')
     ])
     async def save_game(
-        self, 
-        interaction: discord.Interaction, 
-        imagem: discord.Attachment, 
+        self,
+        interaction: discord.Interaction,
+        imagem: discord.Attachment,
         mapa: str,
         placar: str = None,
         status: str = None
@@ -75,7 +72,7 @@ class GameCommands(commands.Cog):
         # Use manual parameters if provided, otherwise use image analysis data
         score_final = placar if placar else (data.get('score', '') if data else '')
         status_final = status if status else (data.get('status', '') if data else '')
-        
+
         # Validate that we have the critical data (score and status)
         if not score_final or not status_final:
             missing = []
@@ -83,7 +80,7 @@ class GameCommands(commands.Cog):
                 missing.append('placar')
             if not status_final:
                 missing.append('status')
-            
+
             await interaction.followup.send(
                 f'❌ Não consegui extrair o **{" e ".join(missing)}** da imagem.\n\n'
                 f'Por favor, execute o comando novamente informando manualmente:\n'
@@ -93,7 +90,7 @@ class GameCommands(commands.Cog):
                 ephemeral=True
             )
             return
-        
+
         # If we didn't get player data from image but have score/status, that's still an issue
         if not data or not data.get('players'):
             await interaction.followup.send(
@@ -102,7 +99,7 @@ class GameCommands(commands.Cog):
                 ephemeral=True
             )
             return
-        
+
         # Update data dict with final score and status
         data['score'] = score_final
         data['status'] = status_final
@@ -154,7 +151,7 @@ class GameCommands(commands.Cog):
         stats = StatMapper.from_dict_list(data.get('players'), game_id=game_id)
         player_service = PlayerService()
         stat_service = StatService()
-        
+
         saved_count = 0
         skipped_players = []
 
@@ -173,7 +170,7 @@ class GameCommands(commands.Cog):
         # Build success message
         message = f'✅ Jogo salvo com sucesso! ID: {game_id}\n'
         message += f'📊 Estatísticas salvas: {saved_count}/{len(stats)} jogadores'
-        
+
         if skipped_players:
             message += f'\n\n⚠️ Jogadores não registrados (estatísticas ignoradas):\n'
             message += '\n'.join([f'• `{nick}`' for nick in skipped_players])

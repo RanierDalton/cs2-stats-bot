@@ -28,10 +28,9 @@ class ImageModel:
 
     def find_by_hash(self, file_hash: str) -> Optional[Image]:
         query = "SELECT * FROM image WHERE file_hash = %s"
-        result = self.driver.select(query, (file_hash,))
+        row = self.driver.select(query, (file_hash,))
 
-        if result:
-            row = result[0]
+        if row:
             return Image(
                 id=row[0],
                 file_hash=row[1],
@@ -48,10 +47,9 @@ class ImageModel:
 
     def find_by_id(self, image_id: int) -> Optional[Image]:
         query = "SELECT * FROM image WHERE id = %s"
-        result = self.driver.select(query, (image_id,))
+        row = self.driver.select(query, (image_id,))
 
-        if result:
-            row = result[0]
+        if row:
             return Image(
                 id=row[0],
                 file_hash=row[1],

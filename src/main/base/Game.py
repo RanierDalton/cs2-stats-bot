@@ -2,7 +2,8 @@ from datetime import datetime
 
 
 class Game:
-    def __init__(self, id=None, date=None, allies_rounds=None, adversary_rounds=None, map_id: int = 1, status='win', image_id=None):
+    def __init__(self, id=None, date=None, allies_rounds=None, adversary_rounds=None,
+                 map_id: int = 1, status='win', image_id=None):
         self._id = id
         self.status = status
         self._date = date if date else datetime.now()

@@ -1,3 +1,4 @@
+from src.main.service.GameService import GameService
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -6,8 +7,6 @@ mock_mysql = MagicMock()
 sys.modules['mysql'] = mock_mysql
 sys.modules['mysql.connector'] = mock_mysql
 sys.modules['dotenv'] = MagicMock()
-
-from src.main.service.GameService import GameService
 
 
 class TestGameService(unittest.TestCase):

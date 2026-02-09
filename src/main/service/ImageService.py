@@ -1,6 +1,7 @@
 from src.main.service.MinioService import MinioService
 from src.main.model.ImageModel import ImageModel
 from src.main.base.Image import Image
+from src.shared.database.MySqlDriver import MySqlDriver
 from src.shared.database.MySqlConnection import MySqlConnection
 from typing import Optional
 
@@ -8,8 +9,8 @@ from typing import Optional
 class ImageService:
     def __init__(self):
         self.minio_service = MinioService()
-        connection = MySqlConnection()
-        self.image_model = ImageModel(connection)
+        driver = MySqlDriver(MySqlConnection())
+        self.image_model = ImageModel(driver)
 
     def upload_image(
         self,

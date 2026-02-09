@@ -22,7 +22,7 @@ class Bot(commands.Bot):
         await self.add_cog(StatCommands(self))
         await self.add_cog(PlayerCommands(self))
         await self.add_cog(MapCommands(self))
-        
+
         print("Sincronizando comandos com o Discord...")
         try:
             synced = await self.tree.sync()
